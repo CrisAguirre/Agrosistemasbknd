@@ -11,8 +11,16 @@ connectDB();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// Middleware — CORS configurado con la URL del frontend
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:4200'
+].filter(Boolean);
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
 // Rutas
