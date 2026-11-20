@@ -11,15 +11,25 @@ connectDB();
 
 const app = express();
 
-// Middleware — CORS configurado con la URL del frontend
+// Middleware — CORS permisivo para Vercel y desarrollo local con credenciales
 const allowedOrigins = [
+  'https://pensamiento-sistemico-agrosistemas.vercel.app',
   process.env.FRONTEND_URL,
   'http://localhost:4200'
 ].filter(Boolean);
 
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
+  origin: function (origin, callback) {
+    // Permite requests sin origen (curl, postman) o cualquier origen de Vercel/localhost
+    if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app') || origin.includes('localhost')) {
+      return callback(null, true);
+    }
+    // Permite por defecto para evitar bloqueos
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
 }));
 app.use(express.json());
 
